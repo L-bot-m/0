@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>购物天堂</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#FF7D00',
+                        neutral: {
+                            100: '#F5F7FA',
+                            200: '#E4E6EB',
+                            300: '#C9CDD4',
+                            400: '#86909C',
+                            500: '#4E5969',
+                            600: '#272E3B',
+                            700: '#1D2129',
+                        }
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                },
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-neutral-100 text-neutral-700 min-h-screen flex flex-col">
+    <!-- 导航栏 -->
+    <header class="sticky top-0 z-50 bg-white shadow-md transition-all duration-300" id="navbar">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16 md:h-20">
+                <!-- Logo -->
+                <a href="#" class="flex items-center space-x-2">
+                    <i class="fa fa-shopping-bag text-primary text-2xl"></i>
+                    <span class="text-xl md:text-2xl font-bold text-neutral-700">购物天堂</span>
+                </a>
+
+                <!-- 搜索框 - 中等屏幕以上显示 -->
+                <div class="hidden md:flex items-center flex-1 max-w-xl mx-8">
+                    <div class="relative w-full">
+                        <input type="text" placeholder="搜索商品..." class="w-full py-2 px-4 pl-10 rounded-full border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all">
+                        <i class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400"></i>
+                    </div>
+                </div>
+
+                <!-- 导航菜单 -->
+                <nav class="flex items-center space-x-4 md:space-x-6">
+                    <a href="#" class="text-neutral-500 hover:text-primary transition-colors">
+                        <i class="fa fa-home text-lg"></i>
+                        <span class="hidden md:inline ml-1">首页</span>
+                    </a>
+                    <a href="#" class="text-neutral-500 hover:text-primary transition-colors">
+                        <i class="fa fa-list-alt text-lg"></i>
+                        <span class="hidden md:inline ml-1">分类</span>
+                    </a>
+                    <a href="#" class="text-neutral-500 hover:text-primary transition-colors relative">
+                        <i class="fa fa-shopping-cart text-lg"></i>
+                        <span class="hidden md:inline ml-1">购物车</span>
+                        <span class="absolute -top-2 -right-2 bg-secondary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
+                    </a>
+                    <a href="#" class="text-neutral-500 hover:text-primary transition-colors">
+                        <i class="fa fa-user text-lg"></i>
+                        <span class="hidden md:inline ml-1">我的账户</span>
+                    </a>
+                    <button class="md:hidden text-neutral-500 hover:text-primary transition-colors" id="mobile-menu-button">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- 搜索框 - 移动屏幕显示 -->
+            <div class="md:hidden pb-3">
+                <div class="relative w-full">
+                    <input type="text" placeholder="搜索商品..." class="w-full py-2 px-4 pl-10 rounded-full border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all">
+                    <i class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400"></i>
+                </div>
+            </div>
+
+            <!-- 移动端菜单 -->
+            <div class="md:hidden hidden bg-white absolute left-0 right-0 top-full shadow-lg border-t border-neutral-100" id="mobile-menu">
+                <div class="container mx-auto px-4 py-3 space-y-3">
+                    <a href="#" class="block py-2 text-neutral-700 hover:text-primary transition-colors">
+                        <i class="fa fa-home w-6"></i> 首页
+                    </a>
+                    <a href="#" class="block py-2 text-neutral-700 hover:text-primary transition-colors">
+                        <i class="fa fa-list-alt w-6"></i> 分类
+                    </a>
+                    <a href="#" class="block py-2 text-neutral-700 hover:text-primary transition-colors">
+                        <i class="fa fa-shopping-cart w-6"></i> 购物车 (3)
+                    </a>
+                    <a href="#" class="block py-2 text-neutral-700 hover:text-primary transition-colors">
+                        <i class="fa fa-user w-6"></i> 我的账户
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1">
+        <!-- 轮播图 -->
+        <section class="relative bg-neutral-200 overflow-hidden">
+            <div class="container mx-auto px-4 py-6">
+                <div class="relative rounded-xl overflow-hidden shadow-lg" style="height: 400px;">
+                    <div class="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/60 z-10 flex items-center">
+                        <div class="container mx-auto px-8 md:px-16">
+                            <h2 class="text-[clamp(1.5rem,4vw,3rem)] font-bold text-white text-shadow leading-tight">
+                                夏日特惠<br>限时抢购
+                            </h2>
+                            <p class="text-white/90 text-lg md:text-xl mt-4 max-w-xl">
+                                探索我们的夏季精选商品，享受高达50%的折扣，还有更多惊喜优惠等你发现！
+                            </p>
+                            <button class="mt-8 bg-white text-primary font-medium py-3 px-8 rounded-full hover:bg-neutral-100 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 duration-300">
+                                立即抢购
+                            </button>
+                        </div>
+                    </div>
+                    <img src="https://picsum.photos/id/1067/1200/400" alt="夏日特惠" class="absolute inset-0 w-full h-full object-cover">
+                </div>
+            </div>
+        </section>
+
+        <!-- 分类导航 -->
+        <section class="py-8 bg-white">
+            <div class="container mx-auto px-4">
+                <h2 class="text-2xl font-bold text-neutral-700 mb-6">商品分类</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    <a href="#" class="flex flex-col items-center p-4 rounded-xl bg-neutral-100 hover:bg-primary/10 transition-colors card-hover">
+                        <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+                            <i class="fa fa-laptop text-primary text-2xl"></i>
+                        </div>
+                        <span class="text-neutral-700 font-medium">电子产品</span>
+                    </a>
+                    <a href="#" class="flex flex-col items-center p-4 rounded-xl bg-neutral-100 hover:bg-primary/10 transition-colors card-hover">
+                        <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+                            <i class="fa fa-tshirt text-primary text-2xl"></i>
+                        </div>
+                        <span class="text-neutral-700 font-medium">服装鞋帽</span>
+                    </a>
+                    <a href="#" class="flex flex-col items-center p-4 rounded-xl bg-neutral-100 hover:bg-primary/10 transition-colors card-hover">
+                        <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+                            <i class="fa fa-cutlery text-primary text-2xl"></i>
+                        </div>
+                        <span class="text-neutral-700 font-medium">食品饮料</span>
+                    </a>
+                    <a href="#" class="flex flex-col items-center p-4 rounded-xl bg-neutral-100 hover:bg-primary/10 transition-colors card-hover">
+                        <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+                            <i class="fa fa-book text-primary text-2xl"></i>
+                        </div>
+                        <span class="text-neutral-700 font-medium">图书音像</span>
+                    </a>
+                    <a href="#" class="flex flex-col items-center p-4 rounded-xl bg-neutral-100 hover:bg-primary/10 transition-colors card-hover">
+                        <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+                            <i class="fa fa-gamepad text-primary text-2xl"></i>
+                        </div>
+                        <span class="text-neutral-700 font-medium">游戏玩具</span>
+                    </a>
+                    <a href="#" class="flex flex-col items-center p-4 rounded-xl bg-neutral-100 hover:bg-primary/10 transition-colors card-hover">
+                        <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+                            <i class="fa fa-gift text-primary text-2xl"></i>
+                        </div>
+                        <span class="text-neutral-700 font-medium">礼品鲜花</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 热卖商品 -->
+        <section class="py-10 bg-neutral-50">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-neutral-700">热卖商品</h2>
+                    <a href="#" class="text-primary hover:text-primary/80 font-medium flex items-center">
+                        查看全部 <i class="fa fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <!-- 商品卡片 1 -->
+                    <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow card-hover">
+                        <div class="relative">
+                            <img src="https://picsum.photos/id/160/400/300" alt="智能手机" class="w-full h-52 object-cover">
+                            <div class="absolute top-3 left-3 bg-secondary text-white text-xs font-bold px-2 py-1 rounded">热卖</div>
+                            <button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 flex items-center justify-center hover:bg-white transition-colors">
+                                <i class="fa fa-heart-o text-neutral-500"></i>
+                            </button>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-medium text-neutral-700 mb-1 line-clamp-1">最新款智能手机 128GB</h3>
+                            <div class="flex items-center mb-2">
+                                <div class="flex text-yellow-400">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star-half-o"></i>
+                                </div>
+                                <span class="text-neutral-400 text-sm ml-2">4.5 (128)</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <span class="text-primary font-bold text-lg">¥2,999</span>
+                                    <span class="text-neutral-400 line-through text-sm ml-1">¥3,499</span>
+                                </div>
+                                <button class="bg-primary/10 hover:bg-primary/20 text-primary p-2 rounded-full transition-colors">
+                                    <i class="fa fa-shopping-cart"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 商品卡片 2 -->
+                    <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow card-hover">
+                        <div class="relative">
+                            <img src="https://picsum.photos/id/96/400/300" alt="无线耳机" class="w-full h-52 object-cover">
+                            <div class="absolute top-3 left-3 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">新品</div>
+                            <button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 flex items-center justify-center hover:bg-white transition-colors">
+                                <i class="fa fa-heart-o text-neutral-500"></i>
+                            </button>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-medium text-neutral-700 mb-1 line-clamp-1">无线蓝牙耳机 主动降噪</h3>
+                            <div class="flex items-center mb-2">
+                                <div class="flex text-yellow-400">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star-o"></i>
+                                </div>
+                                <span class="text-neutral-400 text-sm ml-2">4.0 (89)</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <span class="text-primary font-bold text-lg">¥799</span>
+                                    <span class="text-neutral-400 line-through text-sm ml-1">¥999</span>
+                                </div>
+                                <button class="bg-primary/10 hover:bg-primary/20 text-primary p-2 rounded-full transition-colors">
+                                    <i class="fa fa-shopping-cart"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 商品卡片 3 -->
+                    <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow card-hover">
+                        <div class="relative">
+                            <img src="https://picsum.photos/id/26/400/300" alt="智能手表" class="w-full h-52 object-cover">
+                            <div class="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">-30%</div>
+                            <button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 flex items-center justify-center hover:bg-white transition-colors">
+                                <i class="fa fa-heart-o text-neutral-500"></i>
+                            </button>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-medium text-neutral-700 mb-1 line-clamp-1">多功能智能手表 运动监测</h3>
+                            <div class="flex items-center mb-2">
+                                <div class="flex text-yellow-400">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <span class="text-neutral-400 text-sm ml-2">5.0 (42)</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <span class="text-primary font-bold text-lg">¥1,299</span>
+                                    <span class="text-neutral-400 line-through text-sm ml-1">¥1,899</span>
+                                </div>
+                                <button class="bg-primary/10 hover:bg-primary/20 text-primary p-2 rounded-full transition-colors">
+                                    <i class="fa fa-shopping-cart"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 商品卡片 4 -->
+                    <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow card-hover">
+                        <div class="relative">
+                            <img src="https://picsum.photos/id/119/400/300" alt="笔记本电脑" class="w-full h-52 object-cover">
+                            <div class="absolute top-3 left-3 bg-secondary text-white text-xs font-bold px-2 py-1 rounded">热卖</div>
+                            <button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 flex items-center justify-center hover:bg-white transition-colors">
+                                <i class="fa fa-heart-o text-neutral-500"></i>
+                            </button>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-medium text-neutral-700 mb-1 line-clamp-1">轻薄笔记本电脑 16GB+512GB</h3>
+                            <div class="flex items-center mb-2">
+                                <div class="flex text-yellow-400">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star-half-o"></i>
+                                    <i class="fa fa-star-o"></i>
+                                </div>
+                                <span class="text-neutral-400 text-sm ml-2">3.5 (67)</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <span class="text-primary font-bold text-lg">¥4,599</span>
+                                    <span class="text-neutral-400 line-through text-sm ml-1">¥5,299</span>
+                                </div>
+                                <button class="bg-primary/10 hover:bg-primary/20 text-primary p-2 rounded-full transition-colors">
+                                    <i class="fa fa-shopping-cart"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 促销活动 -->
+        <section class="py-10 bg-white">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-neutral-700">限时促销</h2>
+                    <a href="#" class="text-primary hover:text-primary/80 font-medium flex items-center">
+                        查看全部 <i class="fa fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 促销横幅 1 -->
+                    <div class="relative rounded-xl overflow-hidden h-48 md:h-64 shadow-md group">
+                        <img src="https://picsum.photos/id/252/800/400" alt="电子产品促销" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex flex-col justify-center p-6 md:p-8">
+                            <span class="text-white/90 text-sm md:text-base">限时优惠</span>
+                            <h3 class="text-white text-xl md:text-2xl font-bold mt-1">电子产品专区</h3>
+                            <p class="text-white/80 mt-2 max-w-xs">精选电子产品，最高立减30%</p>
+                            <button class="mt-4 bg-white text-primary font-medium py-2 px-6 rounded-full text-sm hover:bg-neutral-100 transition-colors w-fit">
+                                立即选购
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 促销横幅 2 -->
+                    <div class="relative rounded-xl overflow-hidden h-48 md:h-64 shadow-md group">
+                        <img src="https://picsum.photos/id/26/800/400" alt="家居用品促销" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex flex-col justify-center p-6 md:p-8">
+                            <span class="text-white/90 text-sm md:text-base">限时优惠</span>
+                            <h3 class="text-white text-xl md:text-2xl font-bold mt-1">家居用品专区</h3>
+                            <p class="text-white/80 mt-2 max-w-xs">精选家居好物，满200减50</p>
+                            <button class="mt-4 bg-white text-primary font-medium py-2 px-6 rounded-full text-sm hover:bg-neutral-100 transition-colors w-fit">
+                                立即选购
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 购物车侧边栏 -->
+        <div class="fixed top-0 right-0 h-full w-full md:w-96 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out z-50" id="cart-sidebar">
+            <div class="h-full flex flex-col">
+                <div class="p-4 border-b border-neutral-200 flex justify-between items-center">
+                    <h3 class="font-bold text-lg">购物车 (3)</h3>
+                    <button id="close-cart" class="text-neutral-500 hover:text-neutral-700">
+                        <i class="fa fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="flex-1 overflow-y-auto p-4">
+                    <!-- 购物车商品 1 -->
+                    <div class="flex py-3 border-b border-neutral-100">
+                        <img src="https://picsum.photos/id/160/100/100" alt="智能手机" class="w-20 h-20 object-cover rounded-lg">
+                        <div class="ml-3 flex-1">
+                            <h4 class="font-medium text-neutral-700">最新款智能手机 128GB</h4>
+                            <div class="flex items-center mt-1">
+                                <span class="text-primary font-bold">¥2,999</span>
+                                <span class="text-neutral-400 line-through text-sm ml-2">¥3,499</span>
+                            </div>
+                            <div class="flex items-center mt-2">
+                                <button class="w-6 h-6 border border-neutral-200 rounded flex items-center justify-center">-</button>
+                                <span class="mx-2">1</span>
+                                <button class="w-6 h-6 border border-neutral-200 rounded flex items-center justify-center">+</button>
+                            </div>
+                        </div>
+                        <button class="text-neutral-400 hover:text-red-500">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+
+                    <!-- 购物车商品 2 -->
+                    <div class="flex py-3 border-b border-neutral-100">
+                        <img src="https://picsum.photos/id/96/100/100" alt="无线耳机" class="w-20 h-20 object-cover rounded-lg">
+                        <div class="ml-3 flex-1">
+                            <h4 class="font-medium text-neutral-700">无线蓝牙耳机 主动降噪</h4>
+                            <div class="flex items-center mt-1">
+                                <span class="text-primary font-bold">¥799</span>
+                                <span class="text-neutral-400 line-through text-sm ml-2">¥999</span>
+                            </div>
+                            <div class="flex items-center mt-2">
+                                <button class="w-6 h-6 border border-neutral-200 rounded flex items-center justify-center">-</button>
+                                <span class="mx-2">2</span>
+                                <button class="w-6 h-6 border border-neutral-200 rounded flex items-center justify-center">+</button>
+                            </div>
+                        </div>
+                        <button class="text-neutral-400 hover:text-red-500">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+
+                    <!-- 购物车商品 3 -->
+                    <div class="flex py-3 border-b border-neutral-100">
+                        <img src="https://picsum.photos/id/26/100/100" alt="智能手表" class="w-20 h-20 object-cover rounded-lg">
+                        <div class="ml-3 flex-1">
+                            <h4 class="font-medium text-neutral-700">多功能智能手表 运动监测</h4>
+                            <div class="flex items-center mt-1">
+                                <span class="text-primary font-bold">¥1,299</span>
+                                <span class="text-neutral-400 line-through text-sm ml-2">¥1,899</span>
+                            </div>
+                            <div class="flex items-center mt-2">
+                                <button class="w-6 h-6 border border-neutral-200 rounded flex items-center justify-center">-</button>
+                                <span class="mx-2">1</span>
+                                <button class="w-6 h-6 border border-neutral-200 rounded flex items-center justify-center">+</button>
+                            </div>
+                        </div>
+                        <button class="text-neutral-400 hover:text-red-500">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="p-4 border-t border-neutral-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-neutral-500">小计</span>
+                        <span class="font-bold">¥5,896</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="text-neutral-500">运费</span>
+                        <span class="text-green-500">免费</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="font-bold">总计</span>
+                        <span class="font-bold text-lg text-primary">¥5,896</span>
+                    </div>
+                    <button class="w-full bg-primary text-white font-medium py-3 rounded-lg hover:bg-primary/90 transition-colors">
+                        结算
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 遮罩层 -->
+        <div class="fixed inset-0 bg-black/50 opacity-0 pointer-events-none transition-opacity duration-300 z-40" id="overlay"></div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-neutral-700 text-white pt-12 pb-6">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <i class="fa fa-shopping-bag text-primary text-2xl"></i>
+                        <span class="text-xl font-bold">购物天堂</span>
+                    </div>
+                    <p class="text-neutral-300 mb-4">提供优质的购物体验，丰富的商品种类，便捷的购物流程，让您享受无忧的购物乐趣。</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-neutral-300 hover:text-white transition-colors">
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                        <a href="#" class="text-neutral-300 hover:text-white transition-colors">
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-neutral-300 hover:text-white transition-colors">
+                            <i class="fa fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-neutral-300 hover:text-white transition-colors">
+                            <i class="fa fa-linkedin"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-4">快速链接</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-neutral-300 hover:text-white transition-colors">首页</a></li>
+                        <li><a href="#" class="text-neutral-300 hover:text-white transition-colors">商品分类</a></li>
+                        <li><a href="#" class="text-neutral-300 hover:text-white transition-colors">热卖商品</a></li>
+                        <li><a href="#" class="text-neutral-300 hover:text-white transition-colors">促销活动</a></li>
+                        <li><a href="#" class="text-neutral-300 hover:text-white transition-colors">关于我们</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-4">客户服务</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-neutral-300 hover:text-white transition-colors">我的账户</a></li>
+                        <li><a href="#" class="text-neutral-300 hover:text-white transition-colors">订单查询</a></li>
+                        <li><a href="#" class="text-neutral-300 hover:text-white transition-colors">配送信息</a></li>
+                        <li><a href="#" class="text-neutral-300 hover:text-white transition-colors">退换政策</a></li>
+                        <li><a href="#" class="text-neutral-300 hover:text-white transition-colors">常见问题</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-4">联系我们</h4>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i class="fa fa-map-marker mt-1 mr-3 text-primary"></i>
+                            <span class="text-neutral-300">北京市朝阳区建国路88号</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-phone mr-3 text-primary"></i>
+                            <span class="text-neutral-300">400-123-4567</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-envelope mr-3 text-primary"></i>
+                            <span class="text-neutral-300">service@shop.example.com</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-clock-o mr-3 text-primary"></i>
+                            <span class="text-neutral-300">周一至周日 9:00-22:00</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-neutral-600 mt-8 pt-6 text-center text-neutral-400 text-sm">
+                <p>&copy; 2025 购物天堂 版权所有</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 移动端菜单切换
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // 导航栏滚动效果
+        const navbar = document.getElementById('navbar');
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-lg');
+                navbar.classList.add('bg-white/95');
+                navbar.classList.add('backdrop-blur-sm');
+            } else {
+                navbar.classList.remove('shadow-lg');
+                navbar.classList.remove('bg-white/95');
+                navbar.classList.remove('backdrop-blur-sm');
+            }
+        });
+
+        // 购物车侧边栏
+        const cartLinks = document.querySelectorAll('a[href="#"]:has(.fa-shopping-cart)');
+        const cartSidebar = document.getElementById('cart-sidebar');
+        const closeCart = document.getElementById('close-cart');
+        const overlay = document.getElementById('overlay');
+        
+        cartLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                cartSidebar.classList.remove('translate-x-full');
+                overlay.classList.remove('opacity-0');
+                overlay.classList.remove('pointer-events-none');
+                document.body.style.overflow = 'hidden';
+            });
+        });
+        
+        closeCart.addEventListener('click', () => {
+            cartSidebar.classList.add('translate-x-full');
+            overlay.classList.add('opacity-0');
+            overlay.classList.add('pointer-events-none');
+            document.body.style.overflow = '';
+        });
+        
+        overlay.addEventListener('click', () => {
+            cartSidebar.classList.add('translate-x-full');
+            overlay.classList.add('opacity-0');
+            overlay.classList.add('pointer-events-none');
+            document.body.style.overflow = '';
+        });
+
+        // 商品卡片添加到购物车动画
+        const addToCartButtons = document.querySelectorAll('.fa-shopping-cart').forEach(button => {
+            if (button.closest('button.bg-primary\\/10')) {
+                button.closest('button.bg-primary\\/10').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // 创建动画元素
+                    const cartIcon = document.querySelector('a[href="#"]:has(.fa-shopping-cart) .fa-shopping-cart');
+                    const buttonRect = this.getBoundingClientRect();
+                    const cartRect = cartIcon.getBoundingClientRect();
+                    
+                    const dot = document.createElement('div');
+                    dot.style.position = 'fixed';
+                    dot.style.width = '20px';
+                    dot.style.height = '20px';
+                    dot.style.borderRadius = '50%';
+                    dot.style.backgroundColor = '#165DFF';
+                    dot.style.zIndex = '1000';
+                    dot.style.left = `${buttonRect.left + buttonRect.width / 2}px`;
+                    dot.style.top = `${buttonRect.top + buttonRect.height / 2}px`;
+                    document.body.appendChild(dot);
+                    
+                    // 动画
+                    setTimeout(() => {
+                        dot.style.transition = 'all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)';
+                        dot.style.left = `${cartRect.left + cartRect.width / 2}px`;
+                        dot.style.top = `${cartRect.top + cartRect.height / 2}px`;
+                        dot.style.width = '10px';
+                        dot.style.height = '10px';
+                        dot.style.opacity = '0.5';
+                    }, 10);
+                    
+                    // 动画结束后移除元素并更新购物车数量
+                    setTimeout(() => {
+                        document.body.removeChild(dot);
+                        // 这里可以添加更新购物车数量的逻辑
+                    }, 600);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+    
